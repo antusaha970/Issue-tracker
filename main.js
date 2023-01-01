@@ -12,8 +12,8 @@ function submitIssue(e) {
   const id = Math.floor(Math.random() * 100000000) + '';
   const status = 'Open';
   const isClosed = "normal";
-
-  const issue = { id, description, severity, assignedTo, status, isClosed };
+  issueCnt++;
+  const issue = { id, description, severity, assignedTo, status, isClosed, issueCnt };
   let issues = [];
   if (localStorage.getItem('issues')) {
     issues = JSON.parse(localStorage.getItem('issues'));
@@ -23,8 +23,7 @@ function submitIssue(e) {
 
   document.getElementById('issueInputForm').reset();
   fetchIssues();
-  issueCnt++;
-  setIssueCnt(issueCnt);
+
   e.preventDefault();
 }
 
@@ -49,15 +48,20 @@ const deleteIssue = id => {
   }
   localStorage.setItem('issues', JSON.stringify(issues));
   document.getElementById(`${id}`).style.display = 'none';
-  issueCnt--;
-  setIssueCnt(issueCnt);
+  issueCnt -= 2;
+  fetchIssues();
 }
 
+const getAndSetIssueNum = (num) => {
+  document.getElementById("totalIssues").innerText = num;
+}
 
 const fetchIssues = () => {
   const issues = JSON.parse(localStorage.getItem('issues'));
   const issuesList = document.getElementById('issuesList');
   issuesList.innerHTML = '';
+  const issueCnt = issues.length;
+  getAndSetIssueNum(issueCnt);
 
   for (var i = 0; i < issues.length; i++) {
     const { id, description, severity, assignedTo, status, isClosed } = issues[i];
