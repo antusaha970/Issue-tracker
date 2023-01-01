@@ -1,17 +1,21 @@
 document.getElementById('issueInputForm').addEventListener('submit', submitIssue);
+const setIssueCnt = (count) => {
+  document.getElementById("totalIssues").innerText = count;
+}
 
+let issueCnt = 0;
 function submitIssue(e) {
   const getInputValue = id => document.getElementById(id).value;
   const description = getInputValue('issueDescription');
   const severity = getInputValue('issueSeverity');
   const assignedTo = getInputValue('issueAssignedTo');
-  const id = Math.floor(Math.random()*100000000) + '';
+  const id = Math.floor(Math.random() * 100000000) + '';
   const status = 'Open';
   const isClosed = "normal";
 
-  const issue = { id, description, severity, assignedTo, status,isClosed };
+  const issue = { id, description, severity, assignedTo, status, isClosed };
   let issues = [];
-  if (localStorage.getItem('issues')){
+  if (localStorage.getItem('issues')) {
     issues = JSON.parse(localStorage.getItem('issues'));
   }
   issues.push(issue);
@@ -19,6 +23,8 @@ function submitIssue(e) {
 
   document.getElementById('issueInputForm').reset();
   fetchIssues();
+  issueCnt++;
+  setIssueCnt(issueCnt);
   e.preventDefault();
 }
 
@@ -29,8 +35,6 @@ const closeIssue = id => {
   currentIssue.isClosed = "line-through";
   localStorage.setItem('issues', JSON.stringify(issues));
   fetchIssues();
-
-  // document.getElementById(`${id}`).querySelector('.title').style.textDecoration = "line-through";
 }
 
 const deleteIssue = id => {
@@ -39,23 +43,16 @@ const deleteIssue = id => {
   for (let i = 0; i < issues.length; i++) {
     let obj = issues[i];
     let objId = obj.id;
-    if(objId == id){
-      issues.splice(i,1);
+    if (objId == id) {
+      issues.splice(i, 1);
     }
   }
-  // const remainingIssues = issues.filter( issues.id !== id );
-  // issues.splice(0,1);
   localStorage.setItem('issues', JSON.stringify(issues));
   document.getElementById(`${id}`).style.display = 'none';
+  issueCnt--;
+  setIssueCnt(issueCnt);
 }
 
-// const deleteIssue = id => {
-//   // const issues = JSON.parse(localStorage.getItem('issues'));
-//   const issues = localStorage.getItem('issues');
-//   console.log(issues);
-//   const remainingIssues = issues.filter( issues.id !== id );
-//   localStorage.setItem('issues', JSON.stringify(remainingIssues));
-// }
 
 const fetchIssues = () => {
   const issues = JSON.parse(localStorage.getItem('issues'));
@@ -63,9 +60,9 @@ const fetchIssues = () => {
   issuesList.innerHTML = '';
 
   for (var i = 0; i < issues.length; i++) {
-    const {id, description, severity, assignedTo, status,isClosed} = issues[i];
+    const { id, description, severity, assignedTo, status, isClosed } = issues[i];
 
-    issuesList.innerHTML +=   `<div class="well" id=${id}>
+    issuesList.innerHTML += `<div class="well" id=${id}>
                               <h6>Issue ID: ${id} </h6>
                               <p><span class="label label-info"> ${status} </span></p>
                               <h3 class ="title" style="text-decoration: ${isClosed};"> ${description} </h3>
